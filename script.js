@@ -1,8 +1,39 @@
-const stats = `
+let scoreArray = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+
+let totalScore = 0;
+
+function resetScoreArray(){
+    for (let i = 0; i < scoreArray.length; i++)
+    {
+        for (let j = 0; j < scoreArray[i].length; j++)
+        {
+            scoreArray[i][j] = 0;
+        }
+    }
+}
+
+function tallyScore(){
+    totalScore = 0;
+    for (let i = 0; i < scoreArray.length; i++)
+    {
+        for (let j = 0; j < scoreArray[i].length; j++)
+        {
+            totalScore += scoreArray[i][j];
+        }
+    }
+}
+tallyScore();
+
+const scores = {
+    coins: 16,
+    score: totalScore,
+};
+
+const stats =`
     <h1>Statistics</h1>
-    <div>
-        <p>Coins Left: 0</p>
-        <p>Points Earned: 0</p>
+    <div id="stats">
+        <p>Coins Left: `+scores.coins+`</p>
+        <p>Points Earned: `+scores.score+`</p>
     </div>
 `
 
@@ -112,6 +143,11 @@ function newGame(){
     generateRandom();
 }
 
+function exitGame() // function to close current tab
+{
+    window.close();
+}
+
 function highlight(x){ // function for highlighting box that user is hovering over
     let condition1 = document.querySelector("#residential").classList.contains("clicked");
     let condition2 = document.querySelector("#industry").classList.contains("clicked");
@@ -199,9 +235,9 @@ function choose(z){ // function to change color of box when user clicks it
     let condition4 = document.querySelector("#park").classList.contains("clicked");
     let condition5 = document.querySelector("#road").classList.contains("clicked");
 
+
     if (firstBuilding && (condition1 || condition2 || condition3 || condition4 || condition5)){
         let id = z.getAttribute("id");
-        check(id);
         if (condition1){
             z.classList.add("residential");
             z.classList.replace("notclicked", "clicked");
@@ -239,10 +275,21 @@ function choose(z){ // function to change color of box when user clicks it
         }
         firstBuilding = false;
         generateRandom();
+        scores.coins -= 1;
+        const refreshStats = `
+            <p>Coins Left: `+scores.coins+`</p>
+            <p>Points Earned: `+scores.score+`</p>
+        `
+        document.getElementById("stats").remove();
+        let newStats = document.createElement("div");
+        newStats.setAttribute("id", "stats");
+        newStats.innerHTML = refreshStats;
+        document.querySelector(".flexcontainer .leftSideOfPage div").append(newStats);
+        check(id);
+        keepScore(z);
     }
     else if (z.classList.contains("clickable") && (condition1 || condition2 || condition3 || condition4 || condition5)){
         let id = z.getAttribute("id");
-        check(id);
         if (condition1){
             z.classList.add("residential");
             z.classList.replace("notclicked", "clicked");
@@ -280,15 +327,27 @@ function choose(z){ // function to change color of box when user clicks it
         }
         z.classList.remove("clickable");
         generateRandom();
+        scores.coins -= 1;
+        const refreshStats = `
+            <p>Coins Left: `+scores.coins+`</p>
+            <p>Points Earned: `+scores.score+`</p>
+        `
+        document.getElementById("stats").remove();
+        let newStats = document.createElement("div");
+        newStats.setAttribute("id", "stats");
+        newStats.innerHTML = refreshStats;
+        document.querySelector(".flexcontainer .leftSideOfPage div").append(newStats);
+        check(id);
+        keepScore(z);
     }
 }
 
-function check(id){
-    for (let a = 0; a < 20; a++){
-        for (let b = 0; b < 20; b++){
+function check(id){ // checking adjacent buildings
+    for (let a = 0; a < 20; a++){ // variable a is row
+        for (let b = 0; b < 20; b++){ // variable b is column
             if (id == array[b] + (a + 1)){ // top right bottom left is the order im coding in
                 if (array[b] == "a"){
-                    if ((a + 1) == 1){
+                    if ((a + 1) == 1){ //checking top left
                         if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("notclicked")){
                             document.querySelector("#" + array[b + 1] + (a + 1)).classList.add("clickable"); // right
                         }
@@ -296,7 +355,7 @@ function check(id){
                             document.querySelector("#" + array[b] + (a + 2)).classList.add("clickable"); // bottom
                         }
                     }
-                    else if ((a + 1) == 20){
+                    else if ((a + 1) == 20){ //checking bottom left
                         if (document.querySelector("#" + array[b] + a).classList.contains("notclicked")){
                             document.querySelector("#" + array[b] + a).classList.add("clickable"); // top
                         }
@@ -304,7 +363,7 @@ function check(id){
                             document.querySelector("#" + array[b + 1] + (a + 1)).classList.add("clickable"); // right
                         }
                     }
-                    else{
+                    else{ //checking between top and bottom left
                         if (document.querySelector("#" + array[b] + a).classList.contains("notclicked")){
                             document.querySelector("#" + array[b] + a).classList.add("clickable"); // top
                         }
@@ -316,8 +375,8 @@ function check(id){
                         }
                     }
                 }
-                else if (array[b] == "s"){
-                    if ((a + 1) == 1){
+                else if (array[b] == "s"){ 
+                    if ((a + 1) == 1){ //checking top right
                         if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("notclicked")){
                             document.querySelector("#" + array[b] + (a + 2)).classList.add("clickable"); // bottom
                         }
@@ -325,7 +384,7 @@ function check(id){
                             document.querySelector("#" + array[b - 1] + (a + 1)).classList.add("clickable"); // left
                         }
                     }
-                    else if ((a + 1) == 20){
+                    else if ((a + 1) == 20){ //checking bottom right
                         if (document.querySelector("#" + array[b] + a).classList.contains("notclicked")){
                             document.querySelector("#" + array[b] + a).classList.add("clickable"); // top
                         }
@@ -333,7 +392,7 @@ function check(id){
                             document.querySelector("#" + array[b - 1] + (a + 1)).classList.add("clickable"); // left
                         }
                     }
-                    else{
+                    else{ //checking between top and bottom right
                         if (document.querySelector("#" + array[b] + a).classList.contains("notclicked")){
                             document.querySelector("#" + array[b] + a).classList.add("clickable"); // top
                         }
@@ -346,7 +405,7 @@ function check(id){
                     }
                 }
                 else{
-                    if ((a + 1) == 1){
+                    if ((a + 1) == 1){ //checking top row thats not corners
                         if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("notclicked")){
                             document.querySelector("#" + array[b + 1] + (a + 1)).classList.add("clickable"); // right
                         }
@@ -357,7 +416,7 @@ function check(id){
                             document.querySelector("#" + array[b - 1] + (a + 1)).classList.add("clickable"); // left
                         }
                     }
-                    else if ((a + 1) == 20){
+                    else if ((a + 1) == 20){ //checking bottom row thats not corners
                         if (document.querySelector("#" + array[b] + a).classList.contains("notclicked")){
                             document.querySelector("#" + array[b] + a).classList.add("clickable"); // top
                         }
@@ -368,7 +427,7 @@ function check(id){
                             document.querySelector("#" + array[b - 1] + (a + 1)).classList.add("clickable"); // left
                         }
                     }
-                    else{
+                    else{ //checking the rest
                         if (document.querySelector("#" + array[b] + a).classList.contains("notclicked")){
                             document.querySelector("#" + array[b] + a).classList.add("clickable"); // top
                         }
@@ -400,25 +459,25 @@ function generateRandom(){
     let random2 = 0;
 
     while (random1 == random2){
-        random1 = Math.floor(Math.random() * 4);
-        random2 = Math.floor(Math.random() * 4);
+        random1 = Math.floor(Math.random() * 5);
+        random2 = Math.floor(Math.random() * 5);
     }
 
-    if (random1 == 0 || random2 == 0){
+    //if (random1 == 0 || random2 == 0){
         $("#residential").show();
-    }
-    if (random1 == 1 || random2 == 1){
+    //}
+    //if (random1 == 1 || random2 == 1){
         $("#industry").show();
-    }
-    if (random1 == 2 || random2 == 2){
+    //}
+    //if (random1 == 2 || random2 == 2){
         $("#commercial").show();
-    }
-    if (random1 == 3 || random2 == 3){
+    //}
+    //if (random1 == 3 || random2 == 3){
         $("#park").show();
-    }
-    if (random1 == 4 || random2 == 4){
+    //}
+    //if (random1 == 4 || random2 == 4){
         $("#road").show();
-    }
+    //}
 }
 
 function checkClicked(){
@@ -454,6 +513,929 @@ function checkClicked(){
         document.querySelector("#road").style.backgroundColor = "#55DD33";
     }
 }
+
+function keepScore()
+{        
+    resetScoreArray();
+    for (let a = 0; a < 20; a++){
+        for (let b = 0; b < 20; b++){
+            if (array[b] == "a"){ //checking left side
+                if ((a + 1) == 1){ //checking top left
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+                        scoreArray[a][b] += 1;
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("road")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                }
+                else if ((a + 1) == 20){ //checking bottom left
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+                        scoreArray[a][b] += 1;
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("road")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                }
+                else if ((a + 1) > 1 && (a + 1) < 20){ //checking between top and bottom left
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                else if (document.querySelector("#" + array[b] + (a)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;    
+                                }
+                            }
+                        }
+
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+                        scoreArray[a][b] += 1;
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+                        if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+                            if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("road")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                }             
+            }
+            else if (array[b] == "s"){ // checking right side
+                if ((a + 1) == 1){ //checking top right
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+                        scoreArray[a][b] += 1;
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("road")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                }
+                else if ((a + 1) == 20){ //checking bottom right
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+                        scoreArray[a][b] += 1;
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("road")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                }
+                else if ((a + 1) > 1 && (a + 1) < 20){ //checking between top and bottom right
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                else if (document.querySelector("#" + array[b] + (a)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;    
+                                }
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry"))
+                            {
+                                scoreArray[a][b] = 1;
+                                break;
+                            }
+                            else
+                            {
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("residential"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial"))
+                                {
+                                    scoreArray[a][b] += 1;
+                                }
+                                if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park"))
+                                {
+                                    scoreArray[a][b] += 2;
+                                }
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+                        scoreArray[a][b] += 1;
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+                            if (document.querySelector("#" + array[b] + (a)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                        if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+                            if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                    if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+                        if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+                            if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("road")){
+                                scoreArray[a][b] += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            // else if (array[b] == "b" || array[b] == "c"|| array[b] == "d"|| array[b] == "e"|| array[b] == "f"|| array[b] == "g"|| array[b] == "h"|| array[b] == "i"|| array[b] == "j"|| array[b] == "k"|| array[b] == "l"|| array[b] == "m"|| array[b] == "n"|| array[b] == "o"|| array[b] == "p"|| array[b] == "q"|| array[b] == "r"){ // everything else
+            //     if ((a + 1) == 1){ //checking top no corners
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+            //             scoreArray[a][b] += 1;
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b -b1] + (a + 1)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("road")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("road")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     else if ((a + 1) == 20){ //checking bottom no corners
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b] + (a)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+            //             scoreArray[a][b] += 1;
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("road")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+        }
+    }
+    tallyScore();
+    scores.score = totalScore;
+    const refreshStats = `
+        <p>Coins Left: `+scores.coins+`</p>
+        <p>Points Earned: `+scores.score+`</p>
+    `
+    document.getElementById("stats").remove();
+    let newStats = document.createElement("div");
+    newStats.setAttribute("id", "stats");
+    newStats.innerHTML = refreshStats;
+    document.querySelector(".flexcontainer .leftSideOfPage div").append(newStats);
+}
+
 
 // function main(){
 //     window.requestAnimationFrame(main);
