@@ -514,7 +514,7 @@ function checkClicked(){
     }
 }
 
-function keepScore()
+function keepScore() // left and right sides work, rest don't for some reason. requires trouble shooting
 {        
     resetScoreArray();
     for (let a = 0; a < 20; a++){
@@ -580,7 +580,6 @@ function keepScore()
                             }
                         }
                     }
-
                     if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
                         if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
                             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
@@ -675,7 +674,6 @@ function keepScore()
                             }
                         }
                     }
-
                     if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
                         if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
                             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
@@ -688,7 +686,6 @@ function keepScore()
                             }
                         }
                     }
-
                     if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
                         if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
                             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park")){
@@ -701,7 +698,6 @@ function keepScore()
                             }
                         }
                     }
-
                     if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
                         if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
                             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("road")){
@@ -1203,6 +1199,28 @@ function keepScore()
             //                     }
             //                 }
             //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b] + (a)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
             //             if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("clicked")){ // left
             //                 if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("industry"))
             //                 {
@@ -1413,6 +1431,155 @@ function keepScore()
             //             }
             //         }
             //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("road")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     else if ((a + 1) > 1 && (a + 1) < 20){
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("residential")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("industry"))
+            //                 {
+            //                     scoreArray[a][b] = 1;
+            //                     break;
+            //                 }
+            //                 else
+            //                 {
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("residential"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("commercial"))
+            //                     {
+            //                         scoreArray[a][b] += 1;
+            //                     }
+            //                     if (document.querySelector("#" + array[b - 1] + (a + 2)).classList.contains("park"))
+            //                     {
+            //                         scoreArray[a][b] += 2;
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("industry")){
+            //             scoreArray[a][b] += 1;
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("industry")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("commercial")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("commercial")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("park")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("clicked")){ // below
+            //                 if (document.querySelector("#" + array[b] + (a + 2)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
+            //                 if (document.querySelector("#" + array[b -b1] + (a + 1)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //             if (document.querySelector("#" + array[b] + (a)).classList.contains("clicked")){ // above
+            //                 if (document.querySelector("#" + array[b] + (a)).classList.contains("park")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
+            //         }
+            //         if (document.querySelector("#" + array[b] + (a + 1)).classList.contains("road")){
+            //             if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("clicked")){ // right
+            //                 if (document.querySelector("#" + array[b + 1] + (a + 1)).classList.contains("road")){
+            //                     scoreArray[a][b] += 1;
+            //                 }
+            //             }
             //             if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("clicked")){ // left
             //                 if (document.querySelector("#" + array[b - 1] + (a + 1)).classList.contains("road")){
             //                     scoreArray[a][b] += 1;
