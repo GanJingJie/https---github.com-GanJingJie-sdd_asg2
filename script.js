@@ -1592,14 +1592,14 @@ function keepScore() // left and right sides work, rest don't for some reason. r
     }
     tallyScore();
     scores.score = totalScore;
-    const refreshStats = `
+    const refreshStat = `
         <p>Coins Left: `+scores.coins+`</p>
         <p>Points Earned: `+scores.score+`</p>
     `
     document.getElementById("stats").remove();
     let newStats = document.createElement("div");
     newStats.setAttribute("id", "stats");
-    newStats.innerHTML = refreshStats;
+    newStats.innerHTML = refreshStat;
     document.querySelector(".flexcontainer .leftSideOfPage div").append(newStats);
 }
 
